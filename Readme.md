@@ -1,0 +1,1 @@
+Dashboard for monitoring the COVID19 around the world. Run the Script.R file before the dashboard in order to refresh the data. 
