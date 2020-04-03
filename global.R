@@ -14,11 +14,13 @@ COV19_data$date<-as.Date.character(COV19_data$date)
 countries<-unique(COV19_data$country)
 latest_day<-max(COV19_data$date)
 
+COV19_data<- COV19_data %>% mutate(nb_active_cases=nb_conf_cases-nb_death_cases-nb_recov_cases)
 
 ### World stats
 world_data<-COV19_data %>% group_by(date) %>% summarise(nb_conf_cases=sum(nb_conf_cases),nb_conf_day_cases=sum(nb_conf_day_cases),
                                                         nb_death_cases=sum(nb_death_cases),nb_death_day_cases=sum(nb_death_day_cases),
-                                                        nb_recov_cases=sum(nb_recov_cases),nb_recov_day_cases=sum(nb_recov_day_cases))
+                                                        nb_recov_cases=sum(nb_recov_cases),nb_recov_day_cases=sum(nb_recov_day_cases),
+                                                        nb_active_cases=sum(nb_active_cases))
 
 
 

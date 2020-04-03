@@ -39,7 +39,7 @@ Sidebar {.sidebar}
 ```{r}
  selectInput("countries", label = h3("Countries (multiple)"), 
     choices = countries, 
-    selected = c("France","Germany"),multiple=T)
+    selected = c("France","Germany",'China','US','Spain','Italy'),multiple=T)
 ```
 
 
@@ -52,9 +52,6 @@ Row {data-height=100}
 ### Global {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   valueBox(
     value = "World",
@@ -67,9 +64,6 @@ renderValueBox({
 ### Day {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   valueBox(
     value =latest_day,
@@ -82,9 +76,6 @@ renderValueBox({
 ### Total number of confirmed cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- world_data %>% dplyr::filter(date==latest_day)
   numcases<- numcases$nb_conf_cases[1]
@@ -99,9 +90,6 @@ renderValueBox({
 ### Total number of death cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- world_data %>% dplyr::filter(date==latest_day)
   numcases<- numcases$nb_death_cases[1]
@@ -116,9 +104,6 @@ renderValueBox({
 ### Total number of recovered cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- world_data %>% dplyr::filter(date==latest_day)
   numcases<- numcases$nb_recov_cases[1]
@@ -136,12 +121,9 @@ Row {data-height=100}
 ### Total active cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- world_data %>% dplyr::filter(date==latest_day)
-  numcases<- numcases$nb_conf_cases[1] - numcases$nb_death_cases[1]-numcases$nb_recov_cases[1]
+  numcases<- numcases$nb_active_cases[1]
   valueBox(
     value =numcases,
     icon = "fa-area-chart",
@@ -153,9 +135,6 @@ renderValueBox({
 ### Mortality {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- world_data %>% dplyr::filter(date==latest_day)
   numcases<- round((numcases$nb_death_cases[1]/numcases$nb_conf_cases[1])*100,2) 
@@ -170,9 +149,6 @@ renderValueBox({
 ### New cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   confcases<- world_data %>% dplyr::filter(date==latest_day)
   valueBox(
@@ -187,9 +163,6 @@ renderValueBox({
 ### Death cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   deathcases<- world_data %>% dplyr::filter(date==latest_day)
   valueBox(
@@ -203,9 +176,6 @@ renderValueBox({
 ### Recovered cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   recovcases<- world_data %>% dplyr::filter(date==latest_day)
   valueBox(
@@ -222,9 +192,9 @@ Row {data-height=500}
 ### Top countries 
 
 ```{r}
-top_countries<- COV19_data %>% dplyr::filter(date==latest_day) %>% select(country,date,nb_conf_cases,nb_death_cases,nb_recov_cases)%>% mutate(mortality=round(nb_death_cases*100/nb_conf_cases,2)) %>% arrange(desc(nb_conf_cases))
+top_countries<- COV19_data %>% dplyr::filter(date==latest_day) %>% select(country,date,nb_conf_cases,nb_death_cases,nb_recov_cases,nb_active_cases)%>% mutate(mortality=round(nb_death_cases*100/nb_conf_cases,2)) %>% arrange(desc(nb_conf_cases))
 renderDT({
-  datatable(top_countries,colnames = c('Country'='country','Date'="date",'Nb of confirmed cases'="nb_conf_cases","Nb of death cases"='nb_death_cases','Nb of recovered cases'='nb_recov_cases','Mortality'='mortality'))
+  datatable(top_countries,colnames = c('Country'='country','Date'="date",'Nb. of confirmed cases'="nb_conf_cases","Nb. of death cases"='nb_death_cases','Nb. of recovered cases'='nb_recov_cases','Mortality'='mortality','Nb. of active cases'='nb_active_cases'))
 })
 ```
 
@@ -307,6 +277,20 @@ renderPlotly({
 ``` 
 
 
+Row {data-height=400, .tabset}
+-----------------------------------------------------------------------
+
+### Active cases
+    
+```{r}
+renderPlotly({
+    plot<- world_data %>%  ggplot(aes(date,nb_active_cases))+
+  geom_line() + labs(x="Date",y="Number of active cases",caption = "Source: Johns Hopkins \n Coronavirus Center") +
+  dark_theme_gray()+ scale_color_brewer("Countries",palette = 'Dark2')
+    print(ggplotly(plot,tooltip = c("date","nb_active_cases")))
+})
+```
+
 Unique Country
 =======================================================================
 
@@ -316,9 +300,6 @@ Row {data-height=100}
 ### Country {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   valueBox(
     value = input$country,
@@ -331,9 +312,6 @@ renderValueBox({
 ### Day {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   valueBox(
     value =latest_day,
@@ -346,9 +324,6 @@ renderValueBox({
 ### Total number of confirmed cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   numcases<- numcases$nb_conf_cases[1]
@@ -363,9 +338,6 @@ renderValueBox({
 ### Total number of death cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   numcases<- numcases$nb_death_cases[1]
@@ -380,9 +352,6 @@ renderValueBox({
 ### Total number of recovered cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   numcases<- numcases$nb_recov_cases[1]
@@ -400,9 +369,6 @@ Row {data-height=100}
 ### Total active cases {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   numcases<- numcases$nb_conf_cases[1] - numcases$nb_death_cases[1]-numcases$nb_recov_cases[1]
@@ -417,9 +383,6 @@ renderValueBox({
 ### Mortality {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   numcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   numcases<- round((numcases$nb_death_cases[1]/numcases$nb_conf_cases[1])*100,2) 
@@ -434,9 +397,6 @@ renderValueBox({
 ### New cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   confcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   valueBox(
@@ -451,9 +411,6 @@ renderValueBox({
 ### Death cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   deathcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   valueBox(
@@ -467,9 +424,6 @@ renderValueBox({
 ### Recovered cases (today) {.value-box}
 
 ```{r}
-#conf_cases<- reactive(COV19_confirmed %>% dplyr::filter(country==input$country & date==latest_day))
-#conf_cases<-conf_cases[1,3]
-# Emit the download rate
 renderValueBox({
   recovcases<- COV19_data %>% dplyr::filter(country==input$country & date==latest_day)
   valueBox(
@@ -562,6 +516,20 @@ renderPlotly({
 })
 ``` 
 
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Active cases
+    
+```{r}
+renderPlotly({
+    plot<- COV19_data %>% dplyr::filter(country==input$country) %>%
+  ggplot(aes(date,nb_active_cases))+
+  geom_line() + labs(x="Date",y="Number of active cases",caption = "Source: Johns Hopkins \n Coronavirus Center") +
+  dark_theme_gray()+ scale_color_brewer("Countries",palette = 'Dark2')
+    print(ggplotly(plot,tooltip = c("date","nb_active_cases")))
+})
+```
 
 Multiple Countries
 =======================================================================
@@ -572,8 +540,8 @@ Row {data-height=500}
 ```{r}
 
 renderDT({
-  top_countries<- COV19_data %>% dplyr::filter(country %in% input$countries & date==latest_day) %>% select(country,date,nb_conf_cases,nb_death_cases,nb_recov_cases)%>% mutate(mortality=round(nb_death_cases*100/nb_conf_cases,2))
-  datatable(top_countries,colnames = c('Country'='country','Date'="date",'Nb of confirmed cases'="nb_conf_cases","Nb of death cases"='nb_death_cases','Nb of recovered cases'='nb_recov_cases','Mortality'='mortality'))
+  top_countries<- COV19_data %>% dplyr::filter(country %in% input$countries & date==latest_day) %>% select(country,date,nb_conf_cases,nb_death_cases,nb_recov_cases, nb_active_cases)%>% mutate(mortality=round(nb_death_cases*100/nb_conf_cases,2))
+  datatable(top_countries,colnames = c('Country'='country','Date'="date",'Nb. of confirmed cases'="nb_conf_cases","Nb. of death cases"='nb_death_cases','Nb. of recovered cases'='nb_recov_cases','Mortality'='mortality','Nb. of active cases'='nb_active_cases'))
 })
 ```
 
@@ -615,6 +583,21 @@ renderPlotly(
   plot_conf<- COV19_data %>% dplyr::filter(country %in% input$countries) %>%
   ggplot(aes(date,nb_recov_cases,color=country))+
   geom_line() + labs(x="Date",y="Number of recovered cases",caption = "Source: Johns Hopkins \n Coronavirus Center") +
+  dark_theme_gray()+ scale_color_brewer("Countries",palette = 'Dark2')
+)
+```
+
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Total number of active cases
+    
+```{r}
+renderPlotly(
+  plot_conf<- COV19_data %>% dplyr::filter(country %in% input$countries) %>%
+  ggplot(aes(date,nb_active_cases,color=country))+
+  geom_line() + labs(x="Date",y="Number of active cases",caption = "Source: Johns Hopkins \n Coronavirus Center") +
   dark_theme_gray()+ scale_color_brewer("Countries",palette = 'Dark2')
 )
 ```
