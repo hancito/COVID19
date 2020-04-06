@@ -27,20 +27,6 @@ library(DT)
 </style> 
 
 
-Sidebar {.sidebar}
-=======================================================================
-
-```{r}
- selectInput("country", label = h3("Country (unique)"), 
-    choices = countries, 
-    selected = "France")
-```
-
-```{r}
- selectInput("countries", label = h3("Countries (multiple)"), 
-    choices = countries, 
-    selected = c("France","Germany",'China','US','Spain','Italy'),multiple=T)
-```
 
 
 World
@@ -294,6 +280,19 @@ renderPlotly({
 Unique Country
 =======================================================================
 
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+ selectInput("country", label = h3("Country (unique)"), 
+    choices = countries, 
+    selected = "France")
+```
+
+
+
+
+
 Row {data-height=100}
 -----------------------------------------------------------------------
 
@@ -533,6 +532,18 @@ renderPlotly({
 
 Multiple Countries
 =======================================================================
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+
+```{r}
+ selectInput("countries", label = h3("Countries (multiple)"), 
+    choices = countries, 
+    selected = c("France","Germany",'China','US','Spain','Italy'),multiple=T)
+```
+
+
 Row {data-height=500}
 -----------------------------------------------------------------------
 ### Top countries 
